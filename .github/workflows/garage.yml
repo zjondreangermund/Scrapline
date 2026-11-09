@@ -1,0 +1,14 @@
+name: Garage smoke checks
+on: [push, pull_request]
+jobs:
+  garage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot 4.6.3
+        run: |
+          curl -fL https://github.com/godotengine/godot/releases/download/4.6.3-stable/Godot_v4.6.3-stable_linux.x86_64.zip -o /tmp/godot.zip
+          unzip /tmp/godot.zip -d /tmp/godot
+          sudo install /tmp/godot/Godot_v4.6.3-stable_linux.x86_64 /usr/local/bin/godot
+      - run: godot --headless --path game --editor --import --quit
+      - run: godot --headless --path game --script res://tests/garage_smoke.gd

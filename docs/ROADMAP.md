@@ -28,4 +28,5 @@ Produce the garage/car visual proof and measure it on the target phone before bu
 - [x] First playable scope and acceptance criteria recorded.
 - [x] Roadmap recorded.
 - [ ] Engine prototype selected and benchmarked.
-- [ ] Playable implementation started.
+- [x] Garage prototype implementation started (see GARAGE_STUDY.md).
+- [ ] Final car art and real-device visual/performance validation complete.

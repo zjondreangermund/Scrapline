@@ -1,0 +1,7 @@
+.godot/
+*.blend1
+*.blend2
+builds/
+.DS_Store
+art/source/*.blend
+docs/previews/*.png
