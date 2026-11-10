@@ -3,7 +3,7 @@ extends Node3D
 const MODEL = preload("res://assets/scrapline_hatch.glb")
 var car: Node3D
 var camera: Camera3D
-var yaw := 0.65
+var yaw := PI - 0.65
 var pitch := 0.30
 var distance := 6.4
 var bonnet: Node3D
@@ -30,6 +30,16 @@ func _ready() -> void:
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color("b5c3d2")
 	env.ambient_light_energy = 0.65
+	# A reflected environment gives curved paint readable highlights.
+	var sky := Sky.new()
+	var sky_material := ProceduralSkyMaterial.new()
+	sky_material.sky_top_color = Color("141e30")
+	sky_material.sky_horizon_color = Color("bac9dc")
+	sky_material.ground_bottom_color = Color("11151c")
+	sky_material.ground_horizon_color = Color("667582")
+	sky.sky_material = sky_material
+	env.sky = sky
+	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	environment.environment = env
 	add_child(environment)
@@ -41,6 +51,9 @@ func _ready() -> void:
 		if material and material.resource_name == "BodyPaint":
 			if not paint_material:
 				paint_material = material.duplicate()
+			paint_material.clearcoat_enabled = true
+			paint_material.clearcoat = 0.65
+			paint_material.clearcoat_roughness = 0.16
 			instance.material_override = paint_material
 		if instance.name.begins_with("AlloySpoke") or instance.name.begins_with("WheelHub"):
 			if not wheel_material:
@@ -106,7 +119,7 @@ func _build_ui() -> void:
 	var column := VBoxContainer.new()
 	panel.add_child(column)
 	var title := Label.new()
-	title.text = "SCRAPLINE  /  GARAGE STUDY 01"
+	title.text = "SCRAPLINE  /  GARAGE STUDY 02"
 	title.add_theme_font_size_override("font_size", 25)
 	column.add_child(title)
 	status = Label.new()
@@ -127,12 +140,12 @@ func _build_ui() -> void:
 		_apply_customization()
 		_save_customization())
 	_button(buttons, "Open / close bonnet", _toggle_bonnet)
-	_button(buttons, "Front", func(): yaw = 0.65; _update_camera())
-	_button(buttons, "Rear", func(): yaw = PI - 0.65; _update_camera())
+	_button(buttons, "Front", func(): yaw = PI - 0.65; pitch = 0.25; distance = 6.4; _update_camera())
+	_button(buttons, "Rear", func(): yaw = 0.65; pitch = 0.25; distance = 6.4; _update_camera())
 	_button(buttons, "Engine", func():
 		bonnet_open = false
 		_toggle_bonnet()
-		yaw = 0.3
+		yaw = PI - 0.3
 		pitch = 0.65
 		distance = 3.5
 		_update_camera())

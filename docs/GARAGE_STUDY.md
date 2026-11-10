@@ -1,4 +1,13 @@
-# Garage study 01
+# Garage study 02 — body and materials pass
+
+## November 10 rebuild pass
+Replaced the flat box bonnet and roof with crowned panel meshes, added curvature to the body sides and taper at the nose/tail, tightened wheel fitment, closed the bonnet-front and roof-header gaps, and added transparent tinted glazing with an interior floor, door cards, steering wheel and rear bench. Headlights now have open bezel rings and reflector bowls. The original four/two-headlight switch, paint/wheel choices and bonnet interaction remain.
+
+The Godot garage now has a reflected sky environment and clearcoat paint. Front/rear/engine camera buttons were corrected to face the named end of the car and front/rear presets reset zoom and elevation.
+
+This is an incremental geometry pass. The vehicle is still visibly simplified and has **not reached the requested Need for Speed-like realism**. No final art acceptance, in-engine visual acceptance, Android performance result, or finished racing game is claimed. The next art work requires more accurate panel construction, bumpers, lamp lenses, cabin detail and textures; preserve independently customizable assemblies.
+
+Validation for this pass: regenerated the runtime GLB; Godot 4.6.3 import and the garage smoke checks pass. Updated Blender front/rear renders show the committed model. An in-engine capture was attempted using a dummy X server, but this environment rejected display socket creation. These previews remain offline renders, not phone screenshots.
 
 ## Implemented
 Original reference-guided 3D hatchback mesh, four-headlight front with selectable two-headlight alternative, rolled arches, black front/rear spoilers, smoked rear lamps, engine bay, machined wheels, paint and wheel finish changes, animated bonnet, orbit/zoom, and saved customization.
