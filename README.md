@@ -3,7 +3,7 @@
 A mobile-first 3D drag racing and car restoration game. Find abandoned cars, dismantle assemblies, salvage components, build a personalized car, and prepare for the next race with an AI mechanic.
 
 ## Project status
-Early garage prototype implemented in Godot, with an original reference-guided car model. This is a geometry and interaction study; final vehicle art and phone performance validation remain pending.
+Early garage prototype implemented in Godot, with an original reference-guided car model. The second geometry pass adds curved panels, improved wheel fitment, tinted glazing and a visible cabin; the requested realistic vehicle quality is still pending. This is a geometry and interaction study; final vehicle art and phone performance validation remain pending.
 
 Open `game/project.godot` in Godot 4.6. See [garage study, controls, and validation](docs/GARAGE_STUDY.md).
 
