@@ -58,10 +58,10 @@ function init() {
   } catch(error){console.warn("Studio reflections disabled on this device",error);}
   scene.background = new THREE.Color("#111c28");
   scene.fog = new THREE.Fog("#111c28", 9, 24);
-  camera = new THREE.PerspectiveCamera(42, 1, 0.03, 120);
-  camera.position.set(5.3, 2.65, 6.4);
+  camera = new THREE.PerspectiveCamera(window.innerWidth<700?52:42, 1, 0.03, 180);
+  camera.position.set(...(window.innerWidth<700?[6.9,3.2,9.5]:[5.3,2.65,6.4]));
   controls = new OrbitControls(camera, renderer.domElement);
-  controls.target.set(0, 0.90, 0);
+  controls.target.set(0, window.innerWidth<700?.35:.90, 0);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.minDistance = 3.1;
@@ -153,7 +153,7 @@ function setModel(model,title,custom) {
   modelNote.textContent=custom?"YOUR MODEL • SAVED ON THIS DEVICE":"You can load your own Volkswagen .GLB";
   setupParts();
   applyCustomization();
-  controls.target.set(0,1.0,0);controls.update();
+  controls.target.set(0,window.innerWidth<700?.35:1.0,0);controls.update();
   clearLoading();
 }
 function setupParts() {
@@ -196,9 +196,9 @@ function applyCustomization() {
   savePrefs();
 }
 function focusView(view) {
-  const distance = 6;
+  const distance = window.innerWidth<700?8.4:6;
   const p = view==="front" ? [0,2.1,distance] : view==="rear" ? [0,2.1,-distance] : view==="side" ? [distance,2.1,0] : [3.2,7.6,3.2];
-  camera.position.set(...p);controls.target.set(0,.95,0);controls.update();
+  camera.position.set(...p);controls.target.set(0,window.innerWidth<700?.35:.95,0);controls.update();
   document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("selected",b.dataset.view===view));
 }
 document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>focusView(b.dataset.view)));
