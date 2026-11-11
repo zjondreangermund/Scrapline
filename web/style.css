@@ -79,3 +79,6 @@
  .race-launch{top:25%;left:15px}
  .primary-race-btn{min-width:205px}
 }
+
+.camera-mode{pointer-events:auto;position:absolute;right:18px;top:158px;z-index:3;background:#0b1c2ce8;color:#e8f1f6;border:1px solid #a87b49;border-radius:5px;padding:9px 12px;font-size:10px;font-weight:900;letter-spacing:.08em;box-shadow:0 5px 13px #0005;touch-action:manipulation}
+@media(max-width:700px){.camera-mode{top:143px;right:10px;padding:8px;font-size:9px}}
