@@ -47,6 +47,10 @@ export function enhanceMaterials(model) {
   // GLB exports can bake dark/non-PBR colors into materials. Respect per-part textures,
   // but improve glass, tires, metallic parts and clearcoat where applicable.
   model.traverse(o=>{
+    // Reduce the four imported Golf wheel groups protruding outside the arches.
+    // Only move their object pivots; never rescale the complete body or road wheels.
+    if(!o.isMesh && /^Tire(?:\\.|$)/i.test(o.name||"") && Math.abs(o.position.x)>0.1)
+      o.position.x*=.90;
     if(!o.isMesh)return;
     o.castShadow=true;o.receiveShadow=true;
     const mats=Array.isArray(o.material)?o.material:[o.material];
@@ -55,14 +59,16 @@ export function enhanceMaterials(model) {
       const mat=original.clone(), name=(mat.name||"").toLowerCase();
       if(/window|glass/.test(name)){
         mat.metalness=.12;mat.roughness=.08;
-        if(mat.color)mat.color.set("#54768f");
-        if(mat.map)mat.map=null; // prevent a baked pitch-black window texture
-        mat.transparent=false;mat.opacity=1;
+        if(mat.color)mat.color.set("#617b8e");
+        if(mat.map)mat.map=null; // No opaque black bake hiding the interior.
+        mat.transparent=true;mat.opacity=.42;mat.depthWrite=false;mat.side=THREE.DoubleSide;
         mat.needsUpdate=true;
       } else if(/tire|rubber/.test(name)){
-        mat.metalness=0;mat.roughness=.88;if(mat.color)mat.color.multiplyScalar(.55);
+        mat.metalness=.01;mat.roughness=.95;
+        if(mat.color)mat.color.set("#101216");
+        mat.map=null;mat.vertexColors=false;mat.needsUpdate=true;
       } else if(/rim|chrome|wheelout|alloy/.test(name)){
-        mat.metalness=.73;mat.roughness=.26;
+        mat.metalness=.70;mat.roughness=.29;if(mat.color)mat.color.set("#454c54");
       } else if(/metal|bodypaint|body.paint|paint/.test(name)){
         mat.metalness=.52;mat.roughness=.22;
         if('clearcoat' in mat){mat.clearcoat=.9;mat.clearcoatRoughness=.12;}
@@ -211,4 +217,114 @@ export function decorateTrack3D(track) {
   const sky=new THREE.Mesh(new THREE.SphereGeometry(110,24,14),skyMat);
   sky.position.set(0,0,-15);world.add(sky);
   return world;
+}
+
+
+// Imported GLBs often have no interior. These are independently-addressable,
+// game-ready mesh parts attached to the actual car, not a flat image.
+export function installInterior(car) {
+  const existing=car.getObjectByName("ScraplineInterior");
+  if(existing)return existing;
+  car.updateWorldMatrix(true,true);
+  const interior=new THREE.Group();interior.name="ScraplineInterior";
+  const inv=1/Math.max(.001,car.scale.x);
+  interior.scale.setScalar(inv);
+  interior.position.copy(car.worldToLocal(new THREE.Vector3(0,0,0)));
+  const charcoal=new THREE.MeshStandardMaterial({color:"#181f27",roughness:.9,metalness:0});
+  const upholstery=new THREE.MeshStandardMaterial({color:"#29333b",roughness:.88});
+  const stitch=new THREE.MeshStandardMaterial({color:"#56646e",roughness:.8});
+  const dash=new THREE.MeshStandardMaterial({color:"#1a222a",roughness:.78,metalness:.08});
+  const glass=new THREE.MeshStandardMaterial({color:"#8398a3",roughness:.2,metalness:.35});
+  const add=(name,w,h,d,x,y,z,material,parent=interior)=>{
+    const obj=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
+    obj.name=name;obj.position.set(x,y,z);obj.castShadow=true;parent.add(obj);return obj;
+  };
+  // Cabin floor and door-darkening reduce the hollow black-glass look.
+  add("CabinFloor",1.47,.045,2.2,0,.30,-.12,charcoal);
+  for(const x of [-.37,.37]){
+    const side=x<0?"Driver":"Passenger";
+    add(side+"SeatBase",.38,.17,.46,x,.50,.29,upholstery);
+    const back=add(side+"SeatBack",.38,.61,.17,x,.82,.02,upholstery);
+    back.rotation.x=-.11;
+    const head=add(side+"Headrest",.27,.18,.13,x,1.17,-.02,stitch);
+    head.rotation.x=-.04;
+    add(side+"SeatStitch",.03,.03,.30,x,.61,.30,stitch);
+  }
+  add("RearBenchBase",1.38,.19,.46,0,.48,-.70,upholstery);
+  add("RearBenchBack",1.38,.48,.12,0,.73,-.94,upholstery);
+  add("Dashboard",1.42,.19,.34,0,.83,.99,dash);
+  add("CenterConsole",.22,.22,.64,0,.47,.48,dash);
+  const steer=new THREE.Group();steer.name="SteeringAssembly";
+  steer.position.set(-.38,.94,.79);interior.add(steer);
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.17,.025,8,26),charcoal);
+  ring.rotation.x=.35;steer.add(ring);
+  const stem=new THREE.Mesh(new THREE.CylinderGeometry(.022,.027,.23,8),dash);
+  stem.rotation.x=Math.PI/2;stem.position.z=.09;steer.add(stem);
+  add("InstrumentCluster",.34,.10,.08,-.38,.95,.87,glass);
+  // A simple seated driver silhouette gives cabin depth and casts a shadow.
+  const jacket=new THREE.MeshStandardMaterial({color:"#27323d",roughness:.95});
+  const skin=new THREE.MeshStandardMaterial({color:"#9b785d",roughness:.93});
+  add("DriverTorso",.27,.40,.22,-.37,.82,.19,jacket);
+  const head=new THREE.Mesh(new THREE.SphereGeometry(.12,14,10),skin);
+  head.name="DriverHead";head.position.set(-.37,1.14,.19);head.castShadow=true;interior.add(head);
+  car.add(interior);
+  return interior;
+}
+
+// Longer three-dimensional roadside environment, with distinct 3D shop units
+// rather than repeated flat signs. Lightweight geometry keeps mobile FPS viable.
+export function buildStripBuildings(track) {
+  const buildings=new THREE.Group();buildings.name="StripSideBuildings";
+  track.add(buildings);
+  const walls=[
+    m("#697683",.78,.13),m("#576675",.82,.14),
+    m("#777b78",.86,.06),m("#4e6671",.77,.20)];
+  const roof=m("#273640",.55,.42),door=m("#27323a",.81,.17);
+  const windowMat=new THREE.MeshStandardMaterial({color:"#7398ae",metalness:.24,roughness:.13,
+    emissive:"#0c1b23",emissiveIntensity:.3});
+  const trim=m("#dba252",.45,.50);
+  const signMat=m("#161f29",.72,.25);
+  const asphalt=m("#465258",1,.05);
+  for(let i=0;i<16;i++){
+    const side=i%2===0?-1:1;
+    const z=6-Math.floor(i/2)*14;
+    const x=side*(21+(i%3)*2.3);
+    const width=7+(i%3)*1.25;
+    const depth=6+(i%4)*1.3;
+    const height=3.6+(i%4)*.9;
+    const tint=walls[i%4];
+    box(buildings,[width,height,depth],[x,height/2,z],tint);
+    box(buildings,[width+.45,.26,depth+.4],[x,height+.18,z],roof);
+    // Each industrial building faces the track with independent shutter, sign and windows.
+    const nearFace=x<0?x+width/2+.04:x-width/2-.04;
+    const shutter=box(buildings,[.075,2.3,2.5],[nearFace,1.34,z],door);
+    box(buildings,[.1,.12,2.5],[nearFace+side*.03,2.46,z],trim);
+    for(let j=-1;j<=1;j++){
+      if(j===0)continue;
+      box(buildings,[.08,1.0,.75],[nearFace,2.2,z+j*1.95],windowMat);
+    }
+    // Roof units have depth and actual castable geometry.
+    box(buildings,[1,.55,1.2],[x,height+.60,z-.7],roof);
+    box(buildings,[.75,.06,.9],[x,height+.9,z-.7],trim);
+    if(i%3===0){
+      const banner=box(buildings,[.08,1.05,3.8],
+        [nearFace,3.15,z],signMat);
+      box(buildings,[.11,.09,3.5],[nearFace,3.7,z],trim);
+    }
+    // Concrete shop apron.
+    const driveway=new THREE.Mesh(new THREE.PlaneGeometry(5,depth+2),asphalt);
+    driveway.rotation.x=-Math.PI/2;
+    driveway.position.set(side*14,.06,z);
+    buildings.add(driveway);
+  }
+  // Static speed stripes and road markers are tracked in world space while cars advance.
+  const markerMat=new THREE.MeshBasicMaterial({color:"#d6e7e2"});
+  for(let n=0;n<16;n++){
+    const z=2-n*6.5;
+    for(const x of [-5.2,5.2]){
+      const mark=new THREE.Mesh(new THREE.PlaneGeometry(.25,.7),markerMat);
+      mark.position.set(x,.076,z);mark.rotation.x=-Math.PI/2;buildings.add(mark);
+    }
+  }
+  return buildings;
 }
