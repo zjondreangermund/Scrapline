@@ -3,7 +3,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { DragRace } from "./race.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { enhanceMaterials, decorateGarage3D } from "./world.js";
+import { enhanceMaterials, decorateGarage3D, installInterior } from "./world.js";
 
 const $ = id => document.getElementById(id);
 const container = $("viewport");
@@ -147,6 +147,7 @@ function setModel(model,title,custom) {
   const bounds = new THREE.Box3().setFromObject(currentCar);
   const center = bounds.getCenter(new THREE.Vector3());
   currentCar.position.set(-center.x,-bounds.min.y,-center.z);
+  if(custom) installInterior(currentCar);
   importedUserFile = custom;
   if(race && race.phase!=="garage") race.exit();
   modelTag.textContent=title;
@@ -169,7 +170,7 @@ function setupParts() {
       const materialName=(m.name||"").toLowerCase();
       const objectName=obj.name.toLowerCase();
       const isPaint= /bodypaint|body.paint|carpaint/.test(materialName) || (importedUserFile && materialName==="metal");
-      const isWheel= /alloy|wheelhub|wheelout/.test(materialName+" "+objectName) || (importedUserFile && /^cylinder/.test(objectName));
+      const isWheel= /alloy|wheelhub|wheelout/.test(materialName+" "+objectName);
       if(isPaint && copy.color){paintMaterials.push(copy);paintsSeen.add(copy);}
       if(isWheel && copy.color){wheelMaterials.push(copy);wheelsSeen.add(copy);}
       return copy;
