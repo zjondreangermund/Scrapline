@@ -12,10 +12,10 @@
     <div id="viewport" aria-label="3D vehicle preview"></div>
     <div class="vignette"></div>
     <header class="top">
-      <div class="brand"><span class="brand-icon">S<span class="brand-bar">/</span></span><span><b>SCRAPLINE</b><small>EARLY GARAGE BUILD</small></span></div>
-      <div class="build-tag"><span class="live-dot"></span>3D PREVIEW <span class="hide-narrow">• ALPHA 0.1</span></div>
+      <div class="brand"><span class="brand-icon">S<span class="brand-bar">/</span></span><span><b>SCRAPLINE</b><small>GARAGE + DRAG STRIP BUILD</small></span></div>
+      <div class="build-tag"><span class="live-dot"></span>PLAYABLE BUILD <span class="hide-narrow">• ALPHA 0.2</span></div>
     </header>
-    <div class="car-label"><span class="eyebrow">PROJECT VEHICLE 01</span><h1>GOLF <em>MK1</em></h1><p id="model-tag">Loading 3D model…</p></div>
+    <div id="garage-ui"><div class="car-label"><span class="eyebrow">PROJECT VEHICLE 01</span><h1>GOLF <em>MK1</em></h1><p id="model-tag">Loading 3D model…</p></div>
     <div class="view-controls" aria-label="Camera angles"><button data-view="front">FRONT</button><button data-view="side">SIDE</button><button data-view="rear">REAR</button><button data-view="top">TOP</button></div>
     <div class="hint" id="hint">DRAG TO ROTATE <span>•</span> PINCH TO ZOOM</div>
     <section class="editor" aria-label="Vehicle customization">
@@ -27,6 +27,16 @@
         <div class="custom-cell"><label>HOOD / PARTS</label><button class="option-btn" id="bonnet-btn">OPEN BONNET <span>↗</span></button></div>
       </div>
       <div class="editor-foot"><label for="model-file" class="upload"><span>＋</span> LOAD MY VOLKSWAGEN .GLB</label><input id="model-file" type="file" accept=".glb,model/gltf-binary" hidden><span class="local-note" id="model-note">Use your own uploaded Golf model</span></div>
+    </section>
+    </div>
+    <div class="race-launch" id="race-launch"><button id="race-start" class="primary-race-btn"><span>🏁</span> START DRAG RACE <span>→</span></button><small>¼ MILE • AI OPPONENT • MOBILE CONTROLS</small></div>
+    <section id="race-ui" class="race-ui" aria-label="Drag racing controls" hidden>
+      <div class="race-topbar"><button class="back-race" id="back-garage">‹ GARAGE</button><span>SCRAPLINE <b>¼ MILE</b></span><button class="back-race" id="reset-race">↻ RESTART</button></div>
+      <div class="race-hud" id="race-hud"><div><span class="race-caption">SPEED</span><strong><span id="speed-value">0</span><small>KM/H</small></strong></div><div><span class="race-caption">GEAR</span><strong id="gear-value">1</strong></div><div><span class="race-caption">RPM</span><strong id="rpm-value">1100</strong></div><div><span class="race-caption">RACE TIME</span><strong><span id="race-timer">0.00</span><small>S</small></strong></div></div>
+      <div class="race-signal" id="race-signal" data-signal="staging">STAGING</div>
+      <div class="race-bottom"><div class="race-progress"><div class="progress-head"><span>YOUR GOLF</span><span><span id="distance-value">0</span> / 402 M</span></div><div class="progress-bar"><div id="player-progress"></div></div><div class="progress-head opponent-label"><span>AI CHALLENGER</span><span>OPPONENT</span></div><div class="progress-bar ai-progress"><div id="opponent-progress"></div></div></div>
+      <div class="race-controls"><label class="auto-label"><input type="checkbox" id="auto-shift" checked> AUTO SHIFT</label><button id="shift" class="shift-button">AUTO SHIFT</button><button id="throttle" class="throttle-button">HOLD<br>THROTTLE <span>▲</span></button></div><div class="race-best">BEST ¼ MILE: <b id="best-time">--.--</b></div></div>
+      <div class="race-result" id="race-result" hidden><div class="result-panel"><div class="eyebrow">DRAG STRIP RESULTS</div><h2 data-result-title>RACE COMPLETE</h2><div class="result-times"><p>YOUR GOLF <strong data-result-player>--</strong></p><p>AI CHALLENGER <strong data-result-ai>--</strong></p></div><button class="retry-btn" onclick="document.getElementById('reset-race').click()">RACE AGAIN ↻</button><button class="retry-secondary" onclick="document.getElementById('back-garage').click()">BACK TO GARAGE</button></div></div>
     </section>
     <div class="toast" id="toast" aria-live="polite"></div>
     <div class="loading" id="loading"><div class="spinner"></div><span>PREPARING YOUR GARAGE…</span><small id="loading-details">Loading the vehicle and lighting</small></div>
