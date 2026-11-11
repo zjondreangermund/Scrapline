@@ -84,7 +84,8 @@ function init() {
     previousFrame = now;
     last = now;
     if (race) race.tick(dt);
-    controls.update(); renderer.render(scene,camera);
+    if(!race || race.phase==="garage") controls.update();
+    renderer.render(scene,camera);
   }
   requestAnimationFrame(frame);
   return true;
