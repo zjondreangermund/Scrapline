@@ -1,0 +1,25 @@
+name: Scrapline Web Smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - 'server.mjs'
+      - 'package.json'
+      - 'tests/web_smoke.mjs'
+      - '.github/workflows/web-smoke.yml'
+  pull_request:
+    paths:
+      - 'web/**'
+      - 'server.mjs'
+      - 'package.json'
+      - 'tests/web_smoke.mjs'
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/web_smoke.mjs
