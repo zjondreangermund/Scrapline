@@ -104,6 +104,7 @@ export class DragRace {
     this.player=new THREE.Group();this.aiCar=new THREE.Group();
     for(const [group,x] of [[this.player,-2.85],[this.aiCar,2.85]]){
       const clone=source.clone(true);
+      clone.visible=true;
       // Shallow clone preserves source model shape/materials, but separates animation transforms.
       clone.rotation.y+=Math.PI;
       group.add(clone);group.position.set(x,0,4);this.track.add(group);
