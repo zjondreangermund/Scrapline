@@ -27,3 +27,19 @@ Explore → recover → inspect → dismantle → repair/adapt → customize →
 
 ## Development approach
 Finish and verify one milestone before expanding. Start with a visual and performance proof, then implement the complete salvage-to-race loop. Engine selection is pending a device-tested prototype. Use original or appropriately licensed assets and maintain an asset register.
+
+
+## Mobile browser playable (alpha v0.2)
+
+**Play:** https://scrapline-web-production.up.railway.app/
+
+The browser build is a first playable quarter-mile drag race / interactive garage prototype, separate from the Godot garage study.
+
+- Garage: drag/touch orbit, pinch zoom, paint, alloy finish, GLB file import with local IndexedDB persistence.
+- Race: start light countdown, hold throttle, automatic or manual gear shifts, AI opponent, speed/RPM/gear/timer, quarter-mile finish, stored personal-best time, rematch and return to garage.
+- Mobile browser: scalable UI, touch throttle and shift; keyboard also supports Space/Up throttle and E/Shift for shifting.
+- Car models: the starter garage model is included; uploading a personal Volkswagen GLB on the device makes that model available in the browser and can be saved locally. The custom GLB is **not yet committed** as a shared repo asset and imported fixed mesh parts cannot necessarily open/animate/customize independently.
+- Race physics, graphics and opponent behavior are alpha approximations, not yet a production simulation, true tire/engine setup or an optimized native game.
+- Automated sanity check: `node tests/web_smoke.mjs`.
+
+Hosting: `npm start` serves the `web/` UI plus `game/assets/` binaries. Railway deploys changes from `main`.
