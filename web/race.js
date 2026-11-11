@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { decorateTrack3D } from "./world.js";
 
 const QUARTER_MILE = 402.336;
 const METERS_TO_WORLD = 0.093;
@@ -60,16 +61,17 @@ export class DragRace {
       }
     }
     // Start tree. Three ambers then green.
-    const treePost=this.mesh(new THREE.CylinderGeometry(.12,.14,4,8),postMat,0,2,2);
+    const treePost=this.mesh(new THREE.CylinderGeometry(.12,.14,4,8),postMat,7.15,2,2);
     this.treeBulbs=[];
     for(let i=0;i<4;i++){
-      const bulb=this.mesh(new THREE.SphereGeometry(.19,12,8),new THREE.MeshStandardMaterial({color:i===3?0x09402b:0x503d17,emissive:i===3?0x052418:0x201006,emissiveIntensity:.8}),0,3.28-i*.62,1.9);
+      const bulb=this.mesh(new THREE.SphereGeometry(.19,12,8),new THREE.MeshStandardMaterial({color:i===3?0x09402b:0x503d17,emissive:i===3?0x052418:0x201006,emissiveIntensity:.8}),7.15,3.28-i*.62,1.9);
       this.treeBulbs.push(bulb);
     }
     this.finishBanner=this.mesh(new THREE.BoxGeometry(12,.5,.4),new THREE.MeshStandardMaterial({color:0x171f26,roughness:.45}),0,5.2,4-QUARTER_MILE*METERS_TO_WORLD);
     for(const x of [-5.8,5.8]){
       this.mesh(new THREE.BoxGeometry(.2,5.3,.2),postMat,x,2.65,4-QUARTER_MILE*METERS_TO_WORLD);
     }
+    decorateTrack3D(this.track);
   }
   bindUI() {
     const $=id=>document.getElementById(id);
@@ -115,6 +117,12 @@ export class DragRace {
         o.material=Array.isArray(o.material)?o.material.map(tint):tint(o.material);
       }
     });
+    this.previousFog=this.scene.fog;
+    this.scene.fog=new THREE.FogExp2("#8494a2",0.011);
+    this.previousBackground=this.scene.background;
+    this.scene.background=new THREE.Color("#849ab2");
+    this.previousFov=this.camera.fov;
+    this.camera.fov=67;this.camera.updateProjectionMatrix();
     this.phase="countdown";this.countdown=3.75;this.elapsed=0;this.distance=0;this.speed=0;this.aiDistance=0;this.aiSpeed=0;this.gear=1;this.throttle=false;this.aiReaction=.28+Math.random()*.3;this.aiGear=1;this.aiElapsed=0;this.finishTime=0;this.aiFinishTime=0;
     this.ui.throttle.classList.remove("pressed");
     this.ui.result.hidden=true;this.ui.race.hidden=false;
@@ -128,7 +136,11 @@ export class DragRace {
   }
   exit(){
     this.phase="garage";this.throttle=false;this.ui.race.hidden=true;document.body.classList.remove("in-race");
-    this.track.visible=false;this.garageObjects.forEach(o=>o.visible=true);
+    this.track.visible=false;
+    if(this.previousFog)this.scene.fog=this.previousFog;
+    if(this.previousBackground)this.scene.background=this.previousBackground;
+    this.camera.fov=this.previousFov||42;this.camera.updateProjectionMatrix();
+    this.garageObjects.forEach(o=>o.visible=true);
     if(this.getCar())this.getCar().visible=true;
     this.controls.enabled=true;
     this.camera.position.set(5.3,2.65,6.4);this.controls.target.set(0,.90,0);this.controls.update();
@@ -206,9 +218,10 @@ export class DragRace {
   }
   frameCamera(dt){
     const z=this.player?.position.z||4;
-    const target=new THREE.Vector3(-.75,1.05,z-3.0);
-    const desired=new THREE.Vector3(-.35,3.55,z+9.2);
-    const smoothing=1-Math.exp(-Math.max(.01,dt)*4.5);
+    const target=new THREE.Vector3(-2.6,1.05,z-3.1);
+    const speedFactor=clamp(this.speed/55,0,1);
+    const desired=new THREE.Vector3(-1.25,2.55+speedFactor*.18,z+8.4+speedFactor*2);
+    const smoothing=1-Math.exp(-Math.max(.01,dt)*6.5);
     this.camera.position.lerp(desired,smoothing);
     this.camera.lookAt(target);
   }
