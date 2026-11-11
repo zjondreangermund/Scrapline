@@ -12,8 +12,8 @@
     <div id="viewport" aria-label="3D vehicle preview"></div>
     <div class="vignette"></div>
     <header class="top">
-      <div class="brand"><span class="brand-icon">S<span class="brand-bar">/</span></span><span><b>SCRAPLINE</b><small>GARAGE + DRAG STRIP BUILD</small></span></div>
-      <div class="build-tag"><span class="live-dot"></span>PLAYABLE BUILD <span class="hide-narrow">• ALPHA 0.2</span></div>
+      <div class="brand"><span class="brand-icon">S<span class="brand-bar">/</span></span><span><b>SCRAPLINE</b><small>3D RACING BUILD</small></span></div>
+      <div class="build-tag"><span class="live-dot"></span>PLAYABLE BUILD <span class="hide-narrow">• ALPHA 0.4</span></div>
     </header>
     <div id="garage-ui"><div class="car-label"><span class="eyebrow">PROJECT VEHICLE 01</span><h1>GOLF <em>MK1</em></h1><p id="model-tag">Loading 3D model…</p></div>
     <div class="view-controls" aria-label="Camera angles"><button data-view="front">FRONT</button><button data-view="side">SIDE</button><button data-view="rear">REAR</button><button data-view="top">TOP</button></div>
@@ -33,9 +33,25 @@
     <section id="race-ui" class="race-ui" aria-label="Drag racing controls" hidden>
       <div class="race-topbar"><button class="back-race" id="back-garage">‹ GARAGE</button><span>SCRAPLINE <b>¼ MILE</b></span><button class="back-race" id="reset-race">↻ RESTART</button></div>
       <div class="race-hud" id="race-hud"><div><span class="race-caption">SPEED</span><strong><span id="speed-value">0</span><small>KM/H</small></strong></div><div><span class="race-caption">GEAR</span><strong id="gear-value">1</strong></div><div><span class="race-caption">RPM</span><strong id="rpm-value">1100</strong></div><div><span class="race-caption">RACE TIME</span><strong><span id="race-timer">0.00</span><small>S</small></strong></div></div>
-      <button id="camera-mode" class="camera-mode" type="button">CAMERA: CHASE ↻</button><div class="race-signal" id="race-signal" data-signal="staging">STAGING</div>
+      <div class="race-camera-panel">
+        <button id="camera-mode" class="camera-mode" type="button">CAMERA: CHASE ↻</button>
+        <div class="camera-sliders">
+          <label>ZOOM <input type="range" id="camera-zoom" min="5" max="15" step=".5" value="9" aria-label="Race camera distance"></label>
+          <label>HEIGHT <input type="range" id="camera-height" min="1.5" max="6" step=".25" value="2.8" aria-label="Race camera height"></label>
+        </div>
+        <button id="sound-toggle" class="sound-toggle" type="button">SOUND ON</button>
+      </div>
+      <div class="tach-ui" aria-label="Tachometer with perfect-shift zone">
+        <div class="tach-ring"><div class="tach-inner"><span class="tach-label">RPM ×1000</span>
+          <div class="tach-needle" id="tach-needle"></div><i class="tach-pivot"></i>
+          <strong id="tach-readout">1.1</strong>
+          <span class="tach-ticks">0 <b>4</b> 8</span>
+        </div></div>
+        <div id="shift-hint" class="shift-hint" data-zone="normal">BUILD REVS</div>
+        <small class="tach-legend"><i></i> GREEN = PERFECT SHIFT</small>
+      </div><div class="race-signal" id="race-signal" data-signal="staging">STAGING</div>
       <div class="race-bottom"><div class="race-progress"><div class="progress-head"><span>YOUR GOLF</span><span><span id="distance-value">0</span> / 402 M</span></div><div class="progress-bar"><div id="player-progress"></div></div><div class="progress-head opponent-label"><span>AI CHALLENGER</span><span>OPPONENT</span></div><div class="progress-bar ai-progress"><div id="opponent-progress"></div></div></div>
-      <div class="race-controls"><label class="auto-label"><input type="checkbox" id="auto-shift" checked> AUTO SHIFT</label><button id="shift" class="shift-button">AUTO SHIFT</button><button id="throttle" class="throttle-button">HOLD<br>THROTTLE <span>▲</span></button></div><div class="race-best">BEST ¼ MILE: <b id="best-time">--.--</b></div></div>
+      <div class="race-controls"><label class="auto-label"><input type="checkbox" id="auto-shift" checked> AUTO SHIFT</label><button id="shift" class="shift-button">AUTO SHIFT</button><button id="throttle" class="throttle-button" aria-label="Hold throttle pedal"><span class="pedal-grip" aria-hidden="true"></span><strong>THROTTLE</strong><span class="pedal-arrow">▲</span></button></div><div class="race-best">BEST ¼ MILE: <b id="best-time">--.--</b></div></div>
       <div class="race-result" id="race-result" hidden><div class="result-panel"><div class="eyebrow">DRAG STRIP RESULTS</div><h2 data-result-title>RACE COMPLETE</h2><div class="result-times"><p>YOUR GOLF <strong data-result-player>--</strong></p><p>AI CHALLENGER <strong data-result-ai>--</strong></p></div><button class="retry-btn" onclick="document.getElementById('reset-race').click()">RACE AGAIN ↻</button><button class="retry-secondary" onclick="document.getElementById('back-garage').click()">BACK TO GARAGE</button></div></div>
     </section>
     <div class="toast" id="toast" aria-live="polite"></div>
