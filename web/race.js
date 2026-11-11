@@ -57,7 +57,7 @@ export class DragRace {
       for(const x of [-10,10]){
         this.mesh(new THREE.CylinderGeometry(.09,.13,7.2,6),postMat,x,3.6,z);
         const lamp=this.mesh(new THREE.BoxGeometry(.85,.25,.45),new THREE.MeshBasicMaterial({color:0xcfe6ff}),x,7.2,z);
-        const glow=new THREE.PointLight(0xc9deff,14,18,2);glow.position.set(x,6.7,z);this.track.add(glow);
+        if(z>=-14){const glow=new THREE.PointLight(0xc9deff,12,18,2);glow.position.set(x,6.7,z);this.track.add(glow);}
       }
     }
     // Start tree. Three ambers then green.
