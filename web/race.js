@@ -77,6 +77,15 @@ export class DragRace {
     const $=id=>document.getElementById(id);
     this.ui={garage:$("garage-ui"),race:$("race-ui"),raceBtn:$("race-start"),back:$("back-garage"),reset:$("reset-race"),throttle:$("throttle"),shift:$("shift"),gear:$("gear-value"),rpm:$("rpm-value"),speed:$("speed-value"),distance:$("distance-value"),timer:$("race-timer"),signal:$("race-signal"),opponent:$("opponent-progress"),player:$("player-progress"),result:$("race-result"),best:$("best-time"),auto:$("auto-shift"),hud:$("race-hud")};
     this.ui.raceBtn.addEventListener("click",()=>this.enter());
+    this.cameraMode="chase";
+    this.cameraModeButton=document.getElementById("camera-mode");
+    this.cameraModeButton.addEventListener("click",()=>{
+      const modes=["chase","side","hood"];
+      this.cameraMode=modes[(modes.indexOf(this.cameraMode)+1)%modes.length];
+      this.cameraModeButton.textContent="CAMERA: "+this.cameraMode.toUpperCase()+" ↻";
+      this.camera.fov=this.cameraMode==="hood"?74:this.cameraMode==="side"?57:67;
+      this.camera.updateProjectionMatrix();
+    });
     this.ui.back.addEventListener("click",()=>this.exit());
     this.ui.reset.addEventListener("click",()=>this.enter());
     const th=this.ui.throttle;
@@ -220,9 +229,18 @@ export class DragRace {
   }
   frameCamera(dt){
     const z=this.player?.position.z||4;
-    const target=new THREE.Vector3(-2.6,1.05,z-3.1);
+    let target, desired;
     const speedFactor=clamp(this.speed/55,0,1);
-    const desired=new THREE.Vector3(-1.25,2.55+speedFactor*.18,z+8.4+speedFactor*2);
+    if(this.cameraMode==="side"){
+      target=new THREE.Vector3(-2.85,.95,z-1);
+      desired=new THREE.Vector3(6.5,3.15,z+2.5);
+    } else if(this.cameraMode==="hood"){
+      target=new THREE.Vector3(-2.85,1.5,z-10);
+      desired=new THREE.Vector3(-2.85,1.6,z-1.2);
+    } else {
+      target=new THREE.Vector3(-2.6,1.05,z-3.1);
+      desired=new THREE.Vector3(-1.25,2.55+speedFactor*.18,z+8.4+speedFactor*2);
+    }
     const smoothing=1-Math.exp(-Math.max(.01,dt)*6.5);
     this.camera.position.lerp(desired,smoothing);
     this.camera.lookAt(target);
