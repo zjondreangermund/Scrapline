@@ -1,6 +1,8 @@
 extends Node3D
 ## Visual study only. No race or economy simulation yet.
 const MODEL = preload("res://assets/scrapline_hatch.glb")
+const IMPORTED_MODEL_PATH = "res://assets/volkswagen_citi_golf.glb"
+var imported_model_active := false
 var car: Node3D
 var camera: Camera3D
 var yaw := 0.65
@@ -33,16 +35,25 @@ func _ready() -> void:
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	environment.environment = env
 	add_child(environment)
-	car = MODEL.instantiate()
+	# Keep the original prototype playable until the new binary asset is actually present.
+	var model_resource: PackedScene = MODEL
+	if ResourceLoader.exists(IMPORTED_MODEL_PATH):
+		var imported = load(IMPORTED_MODEL_PATH)
+		if imported is PackedScene:
+			model_resource = imported
+			imported_model_active = true
+	car = model_resource.instantiate()
 	add_child(car)
+	if imported_model_active:
+		_normalize_imported_car()
 	for node in car.find_children("*", "MeshInstance3D", true, false):
 		var instance := node as MeshInstance3D
 		var material := instance.get_active_material(0)
-		if material and material.resource_name == "BodyPaint":
+		if material and (material.resource_name == "BodyPaint" or (imported_model_active and material.resource_name == "Metal")):
 			if not paint_material:
 				paint_material = material.duplicate()
 			instance.material_override = paint_material
-		if instance.name.begins_with("AlloySpoke") or instance.name.begins_with("WheelHub"):
+		if instance.name.begins_with("AlloySpoke") or instance.name.begins_with("WheelHub") or (imported_model_active and instance.name.begins_with("Cylinder")):
 			if not wheel_material:
 				wheel_material = material.duplicate()
 			instance.material_override = wheel_material
@@ -58,6 +69,30 @@ func _ready() -> void:
 	add_child(camera)
 	_update_camera()
 	_build_ui()
+
+# Fit third-party models to the original 3.8 m-wide garage composition without
+# depending on their export origin, scale, or orientation. Does not alter source meshes.
+func _normalize_imported_car() -> void:
+	var bounds := AABB()
+	var first := true
+	for node in car.find_children("*", "MeshInstance3D", true, false):
+		var mesh_node := node as MeshInstance3D
+		if mesh_node.mesh == null:
+			continue
+		var local_bounds := mesh_node.get_aabb().transformed(mesh_node.transform)
+		if first:
+			bounds = local_bounds
+			first = false
+		else:
+			bounds = bounds.merge(local_bounds)
+	if first:
+		return
+	var largest := maxf(bounds.size.x, maxf(bounds.size.y, bounds.size.z))
+	if largest < 0.001:
+		return
+	var factor := 3.8 / largest
+	car.scale = Vector3.ONE * factor
+	car.position = Vector3(-bounds.get_center().x, -bounds.position.y, -bounds.get_center().z) * factor
 
 func _box(size: Vector3, position: Vector3, color: Color, metallic := 0.0) -> void:
 	var item := MeshInstance3D.new()
@@ -110,7 +145,7 @@ func _build_ui() -> void:
 	title.add_theme_font_size_override("font_size", 25)
 	column.add_child(title)
 	status = Label.new()
-	status.text = "Reference-guided prototype • drag to orbit • pinch / wheel to zoom"
+	status.text = ("Imported Volkswagen model" if imported_model_active else "Reference-guided prototype") + " • drag to orbit • pinch / wheel to zoom"
 	column.add_child(status)
 	var buttons := HFlowContainer.new()
 	column.add_child(buttons)
@@ -122,20 +157,23 @@ func _build_ui() -> void:
 		wheel_dark = not wheel_dark
 		_apply_customization()
 		_save_customization())
-	_button(buttons, "2 / 4 headlights", func():
-		headlight_count = 2 if headlight_count == 4 else 4
-		_apply_customization()
-		_save_customization())
-	_button(buttons, "Open / close bonnet", _toggle_bonnet)
+	if not imported_model_active:
+		_button(buttons, "2 / 4 headlights", func():
+			headlight_count = 2 if headlight_count == 4 else 4
+			_apply_customization()
+			_save_customization())
+	if bonnet:
+		_button(buttons, "Open / close bonnet", _toggle_bonnet)
 	_button(buttons, "Front", func(): yaw = 0.65; _update_camera())
 	_button(buttons, "Rear", func(): yaw = PI - 0.65; _update_camera())
-	_button(buttons, "Engine", func():
-		bonnet_open = false
-		_toggle_bonnet()
-		yaw = 0.3
-		pitch = 0.65
-		distance = 3.5
-		_update_camera())
+	if bonnet:
+		_button(buttons, "Engine", func():
+			bonnet_open = false
+			_toggle_bonnet()
+			yaw = 0.3
+			pitch = 0.65
+			distance = 3.5
+			_update_camera())
 	_button(buttons, "−", func(): distance = minf(9, distance + 0.5); _update_camera())
 	_button(buttons, "+", func(): distance = maxf(2.6, distance - 0.5); _update_camera())
 
