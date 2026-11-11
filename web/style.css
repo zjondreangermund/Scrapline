@@ -64,3 +64,18 @@
  .result-panel{padding:22px}.result-panel h2{font-size:28px}
 }
 @media(max-height:670px){.race-launch{bottom:235px}.race-hud{top:60px}.race-signal{top:27%}.race-bottom{padding-top:6px;padding-bottom:8px}.race-progress{padding-bottom:0}.throttle-button{min-height:75px}.race-controls{min-height:78px}}
+
+/* V0.3 visibility fixes: use upper open showroom space, not the car silhouette, for navigation. */
+.race-signal{transition:opacity .25s ease}
+@media(max-width:700px){
+ .race-launch{top:33%;bottom:auto;left:17px;transform:none;align-items:flex-start}
+ .primary-race-btn{min-width:232px;max-width:calc(100vw - 105px);padding:11px 14px;font-size:11px}
+ .race-launch small{font-size:7px;letter-spacing:.07em}
+ .hint{bottom:307px;opacity:.85;font-size:7px}
+ .car-label{top:13%;left:16px}
+ .car-label h1{font-size:clamp(32px,10.5vw,54px)}
+}
+@media(max-width:700px) and (max-height:700px){
+ .race-launch{top:25%;left:15px}
+ .primary-race-btn{min-width:205px}
+}
