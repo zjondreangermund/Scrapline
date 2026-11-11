@@ -79,7 +79,7 @@ func _normalize_imported_car() -> void:
 		var mesh_node := node as MeshInstance3D
 		if mesh_node.mesh == null:
 			continue
-		var local_bounds := mesh_node.get_aabb().transformed(mesh_node.transform)
+		var local_bounds := (car.global_transform.affine_inverse() * mesh_node.global_transform) * mesh_node.get_aabb()
 		if first:
 			bounds = local_bounds
 			first = false
