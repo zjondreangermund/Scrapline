@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { decorateTrack3D } from "./world.js";
+import { decorateTrack3D, buildStripBuildings } from "./world.js";
 import { QUARTER_MILE, PERFECT_SHIFT_MIN, PERFECT_SHIFT_MAX, newVehicle, beginLaunch, shift, advanceVehicle } from "./racePhysics.js";
 import { RaceAudio } from "./raceAudio.js";
 
@@ -79,6 +79,7 @@ export class DragRace {
     for(const x of [-5.8,5.8])
       this.object(new THREE.BoxGeometry(.22,5,.22),silver,x,2.5,courseZ);
     decorateTrack3D(this.track);
+    buildStripBuildings(this.track);
     const sunlight=new THREE.DirectionalLight(0xffdfba,1.1);sunlight.position.set(10,12,-15);this.track.add(sunlight);
     const warm=new THREE.HemisphereLight(0xdbebfb,0x59605b,.7);this.track.add(warm);
   }
