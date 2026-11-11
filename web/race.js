@@ -248,7 +248,7 @@ export class DragRace {
   findWheels(vehicle){
     const wheels=[];
     vehicle.traverse(node=>{
-      if(!node.isMesh && /^Tire(?:\\.\\d+)?$/i.test(node.name||""))
+      if(!node.isMesh && /^Tire(?:\.\d+)?$/i.test(node.name||""))
         wheels.push(node);
     });
     return wheels;
