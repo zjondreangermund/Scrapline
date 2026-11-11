@@ -122,7 +122,17 @@ export class DragRace {
       const facing=new THREE.Group();
       facing.rotation.y=Math.PI;
       facing.add(clone);
-      group.add(facing);group.position.set(x,0,4);this.track.add(group);
+      group.add(facing);
+      // Soft oval grounding shadows stop the vehicles looking like floating GLBs.
+      const groundShadow=new THREE.Mesh(
+        new THREE.CircleGeometry(1,28),
+        new THREE.MeshBasicMaterial({color:"#080e13",transparent:true,opacity:.43,depthWrite:false})
+      );
+      groundShadow.rotation.x=-Math.PI/2;
+      groundShadow.scale.set(1.15,2.25,1);
+      groundShadow.position.y=.085;
+      group.add(groundShadow);
+      group.position.set(x,0,4);this.track.add(group);
     }
     this.aiCar.traverse(o=>{
       if(o.isMesh && o.material){
