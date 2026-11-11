@@ -82,3 +82,61 @@
 
 .camera-mode{pointer-events:auto;position:absolute;right:18px;top:158px;z-index:3;background:#0b1c2ce8;color:#e8f1f6;border:1px solid #a87b49;border-radius:5px;padding:9px 12px;font-size:10px;font-weight:900;letter-spacing:.08em;box-shadow:0 5px 13px #0005;touch-action:manipulation}
 @media(max-width:700px){.camera-mode{top:143px;right:10px;padding:8px;font-size:9px}}
+
+
+/* Scrapline v0.4: readable race dial, pedal, camera tuning and launch feedback */
+.race-camera-panel{position:absolute;right:13px;top:157px;z-index:6;display:flex;flex-direction:column;align-items:stretch;gap:5px;pointer-events:auto;max-width:166px}
+.race-camera-panel .camera-mode{position:static;min-width:145px;box-shadow:0 4px 15px #03090f88}
+.camera-sliders{padding:8px 10px 7px;background:#0b1824e8;border:1px solid #3a515e;border-radius:6px;display:grid;gap:8px}
+.camera-sliders label{display:grid;grid-template-columns:47px 1fr;align-items:center;gap:7px;color:#d2e2e8;font-weight:850;font-size:9px;letter-spacing:.06em}
+.camera-sliders input{width:100%;accent-color:#e7ab56;cursor:pointer}
+.sound-toggle{align-self:flex-end;color:#bdd7dc;border:1px solid #415967;background:#142333ed;font-size:8px;letter-spacing:.08em;font-weight:800;border-radius:4px;padding:6px 9px}
+.tach-ui{pointer-events:none;position:absolute;left:14px;top:32%;z-index:5;width:165px;display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 7px 16px #000a)}
+.tach-ring{height:156px;width:156px;border-radius:50%;background:conic-gradient(from 220deg,#657786 0deg 194deg,#34f09b 194deg 217deg,#eeae5d 217deg 226deg,#f45258 226deg 260deg,#172633 260deg 360deg);padding:10px;box-shadow:inset 0 0 20px #000e,0 0 0 2px #c5d5dd55}
+.tach-inner{position:relative;border-radius:50%;height:100%;width:100%;background:radial-gradient(circle at 50% 70%,#0e1b25,#070e16 75%);border:2px solid #425664;overflow:hidden}
+.tach-label{position:absolute;left:0;right:0;text-align:center;top:16px;color:#adc4d2;font-size:10px;letter-spacing:.11em;font-weight:900}
+.tach-needle{position:absolute;left:50%;top:13%;width:4px;height:40%;transform-origin:50% 100%;background:linear-gradient(#fff9c1,#ffc25e 55%,#ee6638);border-radius:3px;box-shadow:0 0 8px #e8a957bb;transform:translateX(-50%) rotate(-90deg);z-index:2}
+.tach-pivot{position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);height:15px;width:15px;border:4px solid #e8ae62;border-radius:50%;background:#141c29;z-index:3}
+.tach-inner strong{position:absolute;top:69%;left:0;right:0;text-align:center;font-size:28px;color:#eff6f9;font-weight:950;font-variant-numeric:tabular-nums;line-height:1}
+.tach-ticks{position:absolute;top:45%;left:0;right:0;padding:0 17px;display:flex;justify-content:space-between;color:#718b9e;font-size:8px;font-weight:800}
+.tach-ticks b{color:#d8e1e9}
+.shift-hint{font-size:11px;font-weight:950;letter-spacing:.1em;margin-top:9px;background:#0c1a25e8;color:#f0c785;border:1px solid #526573;border-radius:5px;padding:7px 10px;text-align:center;min-width:139px}
+.shift-hint[data-zone="perfect"]{color:#7fffb0;border-color:#3cf99f;background:#103e2fdd;box-shadow:0 0 15px #28f298aa}
+.shift-hint[data-zone="late"]{color:#ff9d93;border-color:#c65c4f}
+.tach-legend{font-size:8px;color:#d9e8dc;letter-spacing:.08em;margin-top:6px;font-weight:850}
+.tach-legend i{display:inline-block;background:#31eb8c;width:7px;height:7px;border-radius:2px;margin-right:4px}
+.throttle-button{position:relative;overflow:hidden;background:linear-gradient(125deg,#617281,#273640 44%,#101a24);color:#f6bd66;border:3px solid #b1bec3;border-radius:14px 14px 19px 19px;box-shadow:0 9px 0 #070f18,0 14px 25px #000b;min-width:155px;min-height:138px;touch-action:none}
+.throttle-button strong{font-size:14px;letter-spacing:.09em;z-index:2;text-shadow:0 2px 3px #000}
+.pedal-grip{position:absolute;inset:11px 11px auto;height:50%;border-radius:8px;background:repeating-linear-gradient(0deg,#1e2c36 0 5px,#566574 5px 8px,#22313b 8px 12px);opacity:.9;box-shadow:inset 0 2px 9px #000}
+.pedal-arrow{font-size:22px;color:#f7b867;margin-top:7px;z-index:2}
+.throttle-button.pressed{background:linear-gradient(135deg,#efa849,#9a672d 65%,#543d29);transform:translateY(5px) scale(.99);box-shadow:0 4px 0 #080e15,0 6px 18px #000a}
+.throttle-button.pressed strong,.throttle-button.pressed .pedal-arrow{color:#fff7d9}
+.shift-button.ideal{border-color:#52f2a0;color:#67fcb0;box-shadow:0 0 16px #25f3a277}
+.race-signal[data-signal="spin"]{color:#ffac69;border-color:#e9873c}
+.race-signal[data-signal="late"]{color:#f7c27e;border-color:#9b7866}
+.race-bottom{background:linear-gradient(transparent,#07111cc9 10%,#07111af5)}
+@media(max-width:700px){
+  .race-camera-panel{right:9px;top:142px;max-width:142px}
+  .race-camera-panel .camera-mode{font-size:8px;min-width:0;padding:8px}
+  .camera-sliders{padding:6px;gap:6px}
+  .camera-sliders label{font-size:8px;grid-template-columns:39px 1fr}
+  .sound-toggle{font-size:7px}
+  .tach-ui{top:31%;left:10px;width:131px}
+  .tach-ring{width:124px;height:124px;padding:8px}
+  .tach-label{font-size:8px;top:12px}
+  .tach-inner strong{font-size:22px}
+  .tach-ticks{font-size:7px;padding:0 9px}
+  .shift-hint{font-size:9px;min-width:123px;padding:6px}
+  .tach-legend{font-size:7px;letter-spacing:0}
+  .throttle-button{min-width:135px;min-height:130px;font-size:12px}
+  .throttle-button strong{font-size:12px}
+  .race-controls{min-height:130px;align-items:end}
+  .shift-button{min-height:88px}
+  .race-bottom{padding-bottom:max(14px,env(safe-area-inset-bottom))}
+}
+@media(max-height:690px) {
+  .tach-ui{top:34%;transform:scale(.84);transform-origin:left top}
+  .race-camera-panel{top:124px}
+  .throttle-button{min-height:99px}
+  .race-controls{min-height:102px}
+}
