@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=5">
+  <meta name="theme-color" content="#091018"><meta name="description" content="Scrapline - mobile 3D garage study for a customizable Volkswagen-inspired drag racer">
+  <title>Scrapline | Mobile Garage</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./style.css">
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+</head>
+<body>
+  <main class="game">
+    <div id="viewport" aria-label="3D vehicle preview"></div>
+    <div class="vignette"></div>
+    <header class="top">
+      <div class="brand"><span class="brand-icon">S<span class="brand-bar">/</span></span><span><b>SCRAPLINE</b><small>EARLY GARAGE BUILD</small></span></div>
+      <div class="build-tag"><span class="live-dot"></span>3D PREVIEW <span class="hide-narrow">• ALPHA 0.1</span></div>
+    </header>
+    <div class="car-label"><span class="eyebrow">PROJECT VEHICLE 01</span><h1>GOLF <em>MK1</em></h1><p id="model-tag">Loading 3D model…</p></div>
+    <div class="view-controls" aria-label="Camera angles"><button data-view="front">FRONT</button><button data-view="side">SIDE</button><button data-view="rear">REAR</button><button data-view="top">TOP</button></div>
+    <div class="hint" id="hint">DRAG TO ROTATE <span>•</span> PINCH TO ZOOM</div>
+    <section class="editor" aria-label="Vehicle customization">
+      <div class="editor-head"><div><span class="eyebrow">CUSTOMIZATION STUDIO</span><h2>BUILD YOUR RIDE</h2></div><span class="stage">GARAGE / 01</span></div>
+      <div class="custom-grid">
+        <div class="custom-cell"><label>BODY PAINT</label><div class="swatches" id="paint-swatches"><button class="swatch active" data-paint="#dfded8" style="--swatch:#dfded8" aria-label="Silver white"></button><button class="swatch" data-paint="#1b4568" style="--swatch:#1b4568" aria-label="Steel blue"></button><button class="swatch" data-paint="#941f2e" style="--swatch:#941f2e" aria-label="Crimson red"></button><button class="swatch" data-paint="#222a32" style="--swatch:#222a32" aria-label="Graphite black"></button><button class="swatch" data-paint="#c3a873" style="--swatch:#c3a873" aria-label="Sand gold"></button></div></div>
+        <div class="custom-cell"><label>WHEEL FINISH</label><button class="option-btn" id="wheels-btn">SILVER ALLOY <span>↻</span></button></div>
+        <div class="custom-cell"><label>HEADLIGHTS</label><button class="option-btn" id="lights-btn">4-LIGHT LOOK <span>↻</span></button></div>
+        <div class="custom-cell"><label>HOOD / PARTS</label><button class="option-btn" id="bonnet-btn">OPEN BONNET <span>↗</span></button></div>
+      </div>
+      <div class="editor-foot"><label for="model-file" class="upload"><span>＋</span> LOAD MY VOLKSWAGEN .GLB</label><input id="model-file" type="file" accept=".glb,model/gltf-binary" hidden><span class="local-note" id="model-note">Use your own uploaded Golf model</span></div>
+    </section>
+    <div class="toast" id="toast" aria-live="polite"></div>
+    <div class="loading" id="loading"><div class="spinner"></div><span>PREPARING YOUR GARAGE…</span><small id="loading-details">Loading the vehicle and lighting</small></div>
+    <div class="unsupported" id="unsupported" hidden><b>3D graphics aren't available</b><span>Try opening this page in Chrome or another WebGL-capable browser.</span></div>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body></html>
