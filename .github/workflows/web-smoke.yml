@@ -7,6 +7,7 @@ on:
       - 'server.mjs'
       - 'package.json'
       - 'tests/web_smoke.mjs'
+      - 'tests/race_physics.mjs'
       - '.github/workflows/web-smoke.yml'
   pull_request:
     paths:
@@ -14,6 +15,7 @@ on:
       - 'server.mjs'
       - 'package.json'
       - 'tests/web_smoke.mjs'
+      - 'tests/race_physics.mjs'
 jobs:
   smoke:
     runs-on: ubuntu-latest
@@ -23,3 +25,4 @@ jobs:
         with:
           node-version: '22'
       - run: node tests/web_smoke.mjs
+      - run: node tests/race_physics.mjs
