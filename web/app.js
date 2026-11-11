@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { DragRace } from "./race.js";
 
 const $ = id => document.getElementById(id);
 const container = $("viewport");
@@ -14,7 +15,8 @@ const lightsBtn = $("lights-btn");
 const bonnetBtn = $("bonnet-btn");
 const paints = [...document.querySelectorAll("[data-paint]")];
 const loader = new GLTFLoader();
-let renderer, scene, camera, controls, currentCar = null, bonnet = null;
+let renderer, scene, camera, controls, currentCar = null, bonnet = null, race = null;
+let garageObjects = [];
 let paintMaterials = [], wheelMaterials = [], lightPairs = [];
 let paintColor = "#dfded8", wheelDark = false, fourLights = true, bonnetOpen = false;
 let importedUserFile = false;
@@ -34,7 +36,9 @@ function init() {
   } catch (e) {
     clearLoading(); $("unsupported").hidden = false; console.error(e); return false;
   }
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.6));
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, window.innerWidth < 700 ? 1.35 : 1.8));
+  renderer.shadowMap.enabled = window.innerWidth >= 700;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.35;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -58,7 +62,10 @@ function init() {
   const key = new THREE.DirectionalLight("#fff4de", 4); key.position.set(3, 7, 4); scene.add(key);
   const rim = new THREE.DirectionalLight("#a2cbe5", 3.1); rim.position.set(-5, 5, -3); scene.add(rim);
   const warm = new THREE.PointLight("#e8aa6a", 45, 12); warm.position.set(4, 3, -4); scene.add(warm);
+  const garageStart = scene.children.length;
   makeGarage();
+  garageObjects = scene.children.slice(garageStart);
+  race = new DragRace({scene,camera,controls,getCar:()=>currentCar,garageObjects,onNotice:message});
   const resize = () => {
     if (!renderer) return;
     const w = Math.max(1, container.clientWidth), h = Math.max(1, container.clientHeight);
@@ -68,20 +75,25 @@ function init() {
   window.addEventListener("resize", resize);
   resize();
   let last = 0;
+  let previousFrame = performance.now();
   function frame(now) {
     requestAnimationFrame(frame);
-    if (document.hidden) return;
+    if (document.hidden) { previousFrame = now; return; }
     if (now - last < (window.innerWidth < 700 ? 33 : 16)) return;
-    last = now; controls.update(); renderer.render(scene,camera);
+    const dt = Math.min((now - previousFrame)/1000,0.08);
+    previousFrame = now;
+    last = now;
+    if (race) race.tick(dt);
+    controls.update(); renderer.render(scene,camera);
   }
   requestAnimationFrame(frame);
   return true;
 }
 function makeGarage() {
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(40,40), new THREE.MeshStandardMaterial({color:"#2b343c",metalness:.18,roughness:.75}));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(40,40), new THREE.MeshStandardMaterial({color:"#202b34",metalness:.28,roughness:.45}));
   floor.rotation.x = -Math.PI / 2; floor.position.y = -0.025; scene.add(floor);
-  const grid = new THREE.GridHelper(34,34,"#58616b","#39454d"); grid.position.y = -.012; grid.material.transparent = true; grid.material.opacity = .35; scene.add(grid);
-  const pad = new THREE.Mesh(new THREE.CylinderGeometry(2.55,2.55,.055,72),new THREE.MeshStandardMaterial({color:"#303940",metalness:.3,roughness:.65}));
+  const grid = new THREE.GridHelper(34,34,"#667581","#3c4b59"); grid.position.y = -.012; grid.material.transparent = true; grid.material.opacity = .35; scene.add(grid);
+  const pad = new THREE.Mesh(new THREE.CylinderGeometry(2.55,2.55,.055,72),new THREE.MeshStandardMaterial({color:"#34414b",metalness:.62,roughness:.33}));
   pad.position.y=-.012; scene.add(pad);
   const torus = new THREE.Mesh(new THREE.TorusGeometry(2.52,.018,8,100),new THREE.MeshBasicMaterial({color:"#ad814d"}));
   torus.rotation.x=-Math.PI/2;torus.position.y=.025;scene.add(torus);
@@ -90,6 +102,12 @@ function makeGarage() {
   for (const x of [-5.4,5.4]) {
     const pillar = new THREE.Mesh(new THREE.BoxGeometry(.32,5.8,.32),new THREE.MeshStandardMaterial({color:"#59626b",metalness:.65,roughness:.43}));
     pillar.position.set(x,2.85,-5.1);scene.add(pillar);
+  }
+  // Soft contact shadow is transparent and mobile-friendly (no expensive shadow map required).
+  const shadowCanvas=document.createElement("canvas");shadowCanvas.width=128;shadowCanvas.height=128;
+  const shadowContext=shadowCanvas.getContext("2d");
+  if(shadowContext){const g=shadowContext.createRadialGradient(64,64,7,64,64,63);g.addColorStop(0,"rgba(0,0,0,.68)");g.addColorStop(.6,"rgba(0,0,0,.39)");g.addColorStop(1,"rgba(0,0,0,0)");shadowContext.fillStyle=g;shadowContext.fillRect(0,0,128,128);
+    const shadow=new THREE.Mesh(new THREE.PlaneGeometry(4.9,2.5),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(shadowCanvas),transparent:true,depthWrite:false}));shadow.rotation.x=-Math.PI/2;shadow.position.y=.046;scene.add(shadow);
   }
   for (const x of [-2.5,0,2.5]) {
     const strip = new THREE.Mesh(new THREE.BoxGeometry(1.5,.045,.15), new THREE.MeshBasicMaterial({color:"#d6e6eb"}));
@@ -115,6 +133,7 @@ function setModel(model,title,custom) {
   const center = bounds.getCenter(new THREE.Vector3());
   currentCar.position.set(-center.x,-bounds.min.y,-center.z);
   importedUserFile = custom;
+  if(race && race.phase!=="garage") race.exit();
   modelTag.textContent=title;
   modelNote.textContent=custom?"YOUR MODEL • SAVED ON THIS DEVICE":"You can load your own Volkswagen .GLB";
   setupParts();
