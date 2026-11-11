@@ -43,3 +43,20 @@ The browser build is a first playable quarter-mile drag race / interactive garag
 - Automated sanity check: `node tests/web_smoke.mjs`.
 
 Hosting: `npm start` serves the `web/` UI plus `game/assets/` binaries. Railway deploys changes from `main`.
+
+
+## Mobile 3D visual rebuild (v0.3, 11 Nov 2026)
+
+The deployed browser game now uses an actual Three.js 3D scene, not a video or flat image. This update addresses screenshots from a phone:
+
+- Player car: corrects the GLB off-origin rotation pivot that could move imported vehicles outside the chase camera.
+- Camera: portrait-safe camera and selectable CHASE / SIDE / HOOD viewpoints.
+- Track: 3D tarmac, pits, spectator seating, mountains, trees, cones, guardrails and trackside signs.
+- Garage: improved workshop props, service bays, metallic reflections and ceiling lights.
+- Materials: PBR updates for glass, tires and body panels; neutral reflections and soft ground shadows.
+- UI: staging pole outside the race camera; GO notice fades and garage start button avoids the car.
+- Mobile: dynamic light count and render resolution are capped.
+
+Known limits: The user's Volkswagen GLB is only available through local import on each device, not permanently copied to the GitHub repo. Realistic mesh topology, UV/texture maps, detachable doors/bonnet, accurate physics and audio are future work. Smoke tests validate syntax and UI wiring but not phone rendering quality or FPS.
+
+Play: https://scrapline-web-production.up.railway.app/
