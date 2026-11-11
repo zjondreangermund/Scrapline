@@ -60,3 +60,20 @@ The deployed browser game now uses an actual Three.js 3D scene, not a video or f
 Known limits: The user's Volkswagen GLB is only available through local import on each device, not permanently copied to the GitHub repo. Realistic mesh topology, UV/texture maps, detachable doors/bonnet, accurate physics and audio are future work. Smoke tests validate syntax and UI wiring but not phone rendering quality or FPS.
 
 Play: https://scrapline-web-production.up.railway.app/
+
+
+## V0.4 Mobile driving and graphics (Nov 11, 2026)
+
+The 3D browser experience has an updated driving pass:
+
+- Real 402.336 m progress from simulated car movement, stronger accelerating motion, gear ratios, wheel spin tied to road speed, and quarter-mile tuned around 14 seconds in automated physics simulation.
+- Launch gameplay: press the throttle as the light turns green for a quick tire chirp and full grip. Holding before green or missing the green produces longer wheelspin and traction penalty.
+- Mobile driving HUD: large analog-style RPM dial with a **narrow green perfect-shift band**, thumb throttle pedal, manual/automatic gear selection, and shift feedback.
+- Cameras: CHASE, SIDE, HOOD and CINEMATIC, plus in-game distance and height sliders and touch-drag/pinch adjustments.
+- Original WebAudio effects: pitch-changing engine note, clean-launch chirp, longer wheelspin sound, and sound on/off toggle.
+- 3D environment: roadside industrial buildings, shutters, signs, workshop roof equipment, roadside markers and less artificial rounded hills.
+- User-imported Golf: darker true-black rubber tires, rim/tyre material split, modest wheel inset, translucent window glass, individual front/rear seats, dashboard, steering wheel and seated driver silhouette.
+
+This remains an **arcade prototype**. Engine power and traction are simplified; sounds are synthesized rather than sampled from a real Golf; it is not a full vehicle dynamics simulation. The underlying Volkswagen GLB still needs a dedicated high-fidelity mesh/UV/texture overhaul and separately rigged, animated body parts to reach modern premium racing-game visual quality. User GLB imports are saved locally on the device, not distributed with the repository.
+
+Open https://scrapline-web-production.up.railway.app/ and refresh if an old version is cached.
