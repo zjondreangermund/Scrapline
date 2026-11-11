@@ -117,11 +117,11 @@ export class DragRace {
         o.material=Array.isArray(o.material)?o.material.map(tint):tint(o.material);
       }
     });
-    this.previousFog=this.scene.fog;
+    if(this.phase==="garage") this.previousFog=this.scene.fog;
     this.scene.fog=new THREE.FogExp2("#8494a2",0.011);
-    this.previousBackground=this.scene.background;
+    if(this.phase==="garage") this.previousBackground=this.scene.background;
     this.scene.background=new THREE.Color("#849ab2");
-    this.previousFov=this.camera.fov;
+    if(this.phase==="garage") this.previousFov=this.camera.fov;
     this.camera.fov=67;this.camera.updateProjectionMatrix();
     this.phase="countdown";this.countdown=3.75;this.elapsed=0;this.distance=0;this.speed=0;this.aiDistance=0;this.aiSpeed=0;this.gear=1;this.throttle=false;this.aiReaction=.28+Math.random()*.3;this.aiGear=1;this.aiElapsed=0;this.finishTime=0;this.aiFinishTime=0;
     this.ui.throttle.classList.remove("pressed");
@@ -129,7 +129,7 @@ export class DragRace {
     document.body.classList.add("in-race");this.controls.enabled=false;
     this.garageObjects.forEach(o=>o.visible=false);this.getCar().visible=false;this.track.visible=true;
     this.treeBulbs.forEach(b=>b.material.emissive.set("#25140b"));
-    this.ui.signal.textContent="STAGING";this.ui.signal.dataset.signal="staging";
+    this.ui.signal.textContent="STAGING";this.ui.signal.dataset.signal="staging";this.ui.signal.style.opacity="1";
     this.ui.player.style.width="0%";this.ui.opponent.style.width="0%";
     this.ui.timer.textContent="0.00";this.ui.speed.textContent="0";this.ui.distance.textContent="0";this.ui.gear.textContent="1";this.ui.rpm.textContent="1100";
     this.last=performance.now();this.frameCamera(0.03);this.notice("Hold THROTTLE on green. Shift manually or use AUTO.");
@@ -143,7 +143,8 @@ export class DragRace {
     this.garageObjects.forEach(o=>o.visible=true);
     if(this.getCar())this.getCar().visible=true;
     this.controls.enabled=true;
-    this.camera.position.set(5.3,2.65,6.4);this.controls.target.set(0,.90,0);this.controls.update();
+    this.camera.position.set(...(window.innerWidth<700?[6.9,3.2,9.5]:[5.3,2.65,6.4]));
+    this.controls.target.set(0,window.innerWidth<700?.35:.90,0);this.controls.update();
   }
   shift(){
     if(!this.manual||this.phase!=="running"||this.gear>=5)return;
@@ -182,6 +183,7 @@ export class DragRace {
     }
     if(this.phase==="complete")return;
     this.elapsed+=dt;
+    if(this.elapsed>1.2)this.ui.signal.style.opacity="0";
     if(!this.finishTime){
       const p=this.stepPhysics(this.speed,this.gear,dt,this.throttle);
       this.speed=p.speed;this.gear=p.gear;
