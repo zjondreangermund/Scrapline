@@ -184,6 +184,8 @@ export class DragRace {
     if(this.player) {this.track.remove(this.player);this.track.remove(this.aiCar);}
     this.player=this.cloneCar(source,-2.85);
     this.aiCar=this.cloneCar(source,2.85);
+    this.playerWheels=this.findWheels(this.player);
+    this.aiWheels=this.findWheels(this.aiCar);
     // Independent AI body colour; never mutate saved garage paint.
     this.aiCar.traverse(obj=>{
       if(!obj.isMesh)return;
@@ -242,6 +244,14 @@ export class DragRace {
     shadow.position.y=.08;car.add(shadow);
     car.position.set(x,0,4);this.track.add(car);
     return car;
+  }
+  findWheels(vehicle){
+    const wheels=[];
+    vehicle.traverse(node=>{
+      if(!node.isMesh && /^Tire(?:\\.\\d+)?$/i.test(node.name||""))
+        wheels.push(node);
+    });
+    return wheels;
   }
   exit(){
     this.phase="garage";this.throttle=false;
@@ -346,6 +356,12 @@ export class DragRace {
     }
     this.player.position.z=4-p.distance*METERS_TO_WORLD;
     this.aiCar.position.z=4-a.distance*METERS_TO_WORLD;
+    // Individual 3D tire groups rotate with true vehicle speed, with extra spin
+    // when traction is lost at the starting line.
+    const playerRotation=(p.speed/.30+(p.spinLeft>0?24:0))*dt;
+    const aiRotation=(a.speed/.30+(a.spinLeft>0?18:0))*dt;
+    for(const wheel of this.playerWheels)wheel.rotateZ(playerRotation);
+    for(const wheel of this.aiWheels)wheel.rotateZ(aiRotation);
     // Gentle acceleration pitch / bounce conveys motion while staying stable on phones.
     this.player.rotation.x=clamp((p.speed-(p.previousSpeed||0))*2.2,-.045,.045);
     p.previousSpeed=p.speed;
