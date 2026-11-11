@@ -49,7 +49,7 @@ export function enhanceMaterials(model) {
   model.traverse(o=>{
     // Reduce the four imported Golf wheel groups protruding outside the arches.
     // Only move their object pivots; never rescale the complete body or road wheels.
-    if(!o.isMesh && /^Tire(?:\\.|$)/i.test(o.name||"") && Math.abs(o.position.x)>0.1)
+    if(!o.isMesh && /^Tire(?:\.|$)/i.test(o.name||"") && Math.abs(o.position.x)>0.1)
       o.position.x*=.90;
     if(!o.isMesh)return;
     o.castShadow=true;o.receiveShadow=true;
