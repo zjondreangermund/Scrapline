@@ -17,7 +17,7 @@ export function newVehicle(power=1) {
 export function beginLaunch(v, kind) {
   v.started=true;
   v.launchKind=kind;
-  v.spinLeft=kind==="spin"?1.4:0;
+  v.spinLeft=kind==="spin"?1.4:kind==="late"?.8:0;
   v.launchBoost=kind==="perfect"?1.15:0;
   v.shiftPenalty=kind==="late"?.26:0;
 }
