@@ -116,9 +116,13 @@ export class DragRace {
     for(const [group,x] of [[this.player,-2.85],[this.aiCar,2.85]]){
       const clone=source.clone(true);
       clone.visible=true;
-      // Shallow clone preserves source model shape/materials, but separates animation transforms.
-      clone.rotation.y+=Math.PI;
-      group.add(clone);group.position.set(x,0,4);this.track.add(group);
+      // Rotate a PARENT PIVOT, not the imported GLB itself. Imported cars often
+      // contain off-origin meshes and a compensating translation on their root.
+      // Rotating that root alone can displace the car several metres off track.
+      const facing=new THREE.Group();
+      facing.rotation.y=Math.PI;
+      facing.add(clone);
+      group.add(facing);group.position.set(x,0,4);this.track.add(group);
     }
     this.aiCar.traverse(o=>{
       if(o.isMesh && o.material){
