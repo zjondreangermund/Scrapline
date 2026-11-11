@@ -203,11 +203,12 @@ export function decorateTrack3D(track) {
     dummy.position.set(x,2.15,z);dummy.scale.set(.8+(i%3)*.08,.9+(i%4)*.07,.8);dummy.updateMatrix();canopies.setMatrixAt(i,dummy.matrix);
   }
   trunks.instanceMatrix.needsUpdate=true;canopies.instanceMatrix.needsUpdate=true;world.add(trunks,canopies);
-  // Mountain silhouettes are genuine low-poly geometry (not image backdrops).
-  for(let i=0;i<11;i++){
-    const x=-57+i*11;
-    const mountain=new THREE.Mesh(new THREE.ConeGeometry(8+(i%3)*2,12+(i%4)*3,5),m(i%2?"#5e7071":"#697676",1));
-    mountain.position.set(x,2.5,-75-(i%2)*5);world.add(mountain);
+  // Rounded distant ridgelines instead of obvious pyramid-shaped mountains.
+  for(let i=0;i<14;i++){
+    const x=-83+i*13;
+    const hill=new THREE.Mesh(new THREE.SphereGeometry(1,16,10),m(i%2?"#72878a":"#889898",1));
+    hill.scale.set(12+(i%3)*3,4+(i%4)*1.4,9+(i%3));
+    hill.position.set(x,-.8,-118-(i%2)*8);world.add(hill);
   }
   const skyMat=new THREE.ShaderMaterial({
     side:THREE.BackSide,depthWrite:false,
