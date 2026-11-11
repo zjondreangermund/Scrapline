@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { DragRace } from "./race.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { enhanceMaterials, decorateGarage3D } from "./world.js";
 
 const $ = id => document.getElementById(id);
 const container = $("viewport");
@@ -40,11 +42,20 @@ function init() {
   renderer.shadowMap.enabled = window.innerWidth >= 700;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.35;
+  renderer.toneMappingExposure = 1.22;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setSize(container.clientWidth, container.clientHeight);
   container.appendChild(renderer.domElement);
   scene = new THREE.Scene();
+  // PMREM studio reflections make metallic bodywork and glass read as real 3D.
+  try {
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const studio = new RoomEnvironment();
+    const env = pmrem.fromScene(studio,0.03);
+    scene.environment = env.texture;
+    scene.environmentIntensity=0.78;
+    pmrem.dispose();studio.dispose();
+  } catch(error){console.warn("Studio reflections disabled on this device",error);}
   scene.background = new THREE.Color("#111c28");
   scene.fog = new THREE.Fog("#111c28", 9, 24);
   camera = new THREE.PerspectiveCamera(42, 1, 0.03, 120);
@@ -59,11 +70,12 @@ function init() {
   controls.enablePan = false;
   controls.update();
   const hemis = new THREE.HemisphereLight("#cfe7ff", "#5e6270", 2.1); scene.add(hemis);
-  const key = new THREE.DirectionalLight("#fff4de", 4); key.position.set(3, 7, 4); scene.add(key);
+  const key = new THREE.DirectionalLight("#fff4de", 3.2); key.position.set(3, 7, 4); scene.add(key);
   const rim = new THREE.DirectionalLight("#a2cbe5", 3.1); rim.position.set(-5, 5, -3); scene.add(rim);
   const warm = new THREE.PointLight("#e8aa6a", 45, 12); warm.position.set(4, 3, -4); scene.add(warm);
   const garageStart = scene.children.length;
   makeGarage();
+  decorateGarage3D(scene);
   garageObjects = scene.children.slice(garageStart);
   race = new DragRace({scene,camera,controls,getCar:()=>currentCar,garageObjects,onNotice:message});
   const resize = () => {
@@ -123,7 +135,9 @@ function loadPrefs() {
 }
 function setModel(model,title,custom) {
   if(currentCar) { scene.remove(currentCar); }
-  currentCar = model;scene.add(currentCar);
+  currentCar = model;
+  enhanceMaterials(currentCar);
+  scene.add(currentCar);
   const b = new THREE.Box3().setFromObject(currentCar);
   if(b.isEmpty()) throw new Error("The model contains no visible geometry.");
   const size = b.getSize(new THREE.Vector3());
