@@ -72,7 +72,7 @@ function init() {
   const hemis = new THREE.HemisphereLight("#cfe7ff", "#5e6270", 2.1); scene.add(hemis);
   const key = new THREE.DirectionalLight("#fff4de", 3.2); key.position.set(3, 7, 4); scene.add(key);
   const rim = new THREE.DirectionalLight("#a2cbe5", 3.1); rim.position.set(-5, 5, -3); scene.add(rim);
-  const warm = new THREE.PointLight("#e8aa6a", 45, 12); warm.position.set(4, 3, -4); scene.add(warm);
+  const warm = new THREE.PointLight("#e8aa6a", 16, 12); warm.position.set(4, 3, -4); scene.add(warm);
   const garageStart = scene.children.length;
   makeGarage();
   decorateGarage3D(scene);
